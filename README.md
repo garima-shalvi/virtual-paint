@@ -11,6 +11,7 @@ A computer vision–based virtual painting application using OpenCV and Flask.
 - Python
 - OpenCV
 - Flask
+- HTML / CSS / JavaScript
 
 ## How to Run
 1. Clone the repository
