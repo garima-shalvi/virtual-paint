@@ -36,6 +36,17 @@ display: flex;
 justify-content: center;
 gap: 150px;
 }
+.bt1{
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+.paint{
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 40px; 
+}
 #res:hover{
 animation: resb 1s ease-in-out infinite;
 }
@@ -43,7 +54,11 @@ animation: resb 1s ease-in-out infinite;
 0% { box-shadow: 0 0 0px red;}
 50%{box-shadow: 0 0 50px red;}
 100% { box-shadow: 0 0 0px red;}
-
+}
+.color-btn.active{
+background: rgba(0,255,239,0.15);
+box-shadow: 0 0 10px rgba(0,255,239,0.8),0 0 25px rgba(0,255,239,0.8);
+transform: scale(1.08);
 }
 #hm:hover{
 box-shadow: 0 0 25px rgba(0,255,239,0.7);
@@ -53,8 +68,19 @@ box-shadow: 0 0 25px rgba(0,255,239,0.7);
 <body>
 <h1 >Paint here</h1>
 <div>
+<div class="paint">
 <div id="im">
-<img src="{{ url_for('video') }}" /></div>
+<img src="{{ url_for('video') }}" />
+</div>
+<div class="bt1">
+<button class="color-btn none-btn active" onclick="setNone()" style="border-color:white;">None</button>
+<button class="color-btn" data-id="0" onclick="setColor(0)" style="border-color:blue;">Blue</button>
+<button class="color-btn" data-id="1" onclick="setColor(1)" style="border-color:green;">Green</button>
+<button class="color-btn" data-id="2" onclick="setColor(2)" style="border-color:yellow;">Yellow</button>
+<button class="color-btn" data-id="3" onclick="setColor(3)" style="border-color:orange;">Orange</button>
+<button class="color-btn" data-id="4" onclick="setColor(4)" style="border-color:pink;">Light Pink</button>
+</div>
+</div>
 <div class="btn">
 <a href="/home">
 <button id="hm">Back Home</button>
@@ -62,5 +88,24 @@ box-shadow: 0 0 25px rgba(0,255,239,0.7);
 
 <button id="res" onclick="fetch('/clear')">Reset</button></div>
 </div>
+
+<script>
+function clearActive(){
+document.querySelectorAll('.color-btn').forEach(btn=> btn.classList.remove('active'));
+}
+function setColor(id){
+fetch(`/set-color/${id}`,{method: 'POST'});
+clearActive();
+document.querySelector(`.color-btn[data-id="${id}"]`).classList.add('active');
+}
+function setNone(){
+fetch('/set-none',{method: 'POST'});
+clearActive();
+document.querySelector('.none-btn').classList.add('active');
+}
+window.onload=()=>{
+setNone();
+};
+</script>
 </body>
 </html>

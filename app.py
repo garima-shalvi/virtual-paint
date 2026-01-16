@@ -8,69 +8,84 @@ camera.set(3,300)
 camera.set(4,400)
 camera.set(10,120)
 
-myColors=[[115, 50, 50, 170, 255, 255],[6, 99, 172, 53, 255, 255]]
-myCval=[[255,0,255],[0,255,255]]
+myColors=[[100, 150, 50, 130, 255, 255] ,[40,80,80,75,255,255],[20,120,120,35,255,255],[5,120,80,20,255,255],[121,51,137,179,255,255]]
+myCval=[(255,0,0),(0,255,0),(0,255,255),(0,165,255),(203,192,255)]
 mypts= [] #[x, y, colorid]
-
-def findColor(img,myColor,myCval,imgres):
-    imgHSV=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    count=0
-    newpts=[]
-    for c in myColor:
-        lower = np.array(c[0:3])
-        upper = np.array(c[3:6])
-        mask = cv2.inRange(imgHSV, lower, upper)
-        #cv2.imshow(str(c[0]), mask)
-        x,y=getContours(mask)
-        cv2.circle(imgres,(x,y),5,myCval[count],cv2.FILLED)
-        if x!=0 and y!=0:
-            newpts.append([x,y,count])
-        count+=1
-    return newpts
+active_color_id= None
 
 
-def getContours(img):
-    contours,hierarchy=cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-    x,y,w,h=0,0,0,0
+def findColor(img, colorRange, drawColor, imgres):
+    imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    lower = np.array(colorRange[0:3])
+    upper = np.array(colorRange[3:6])
+
+    mask = cv2.inRange(imgHSV, lower, upper)
+
+    kernel = np.ones((7, 7), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+    x, y = getContours(mask)
+
+    if x != 0 and y != 0:
+        cv2.circle(imgres, (x, y), 8, drawColor, cv2.FILLED)
+        return x, y
+
+    return None
+
+
+def getContours(mask):
+    contours, _ = cv2.findContours(
+        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )
+
+    max_area = 0
+    cx, cy = 0, 0
+
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 500:
-            #cv2.drawContours(imgres, cnt, -1, (255, 0, 0), 3)
-            peri=cv2.arcLength(cnt,True)
-            approx=cv2.approxPolyDP(cnt,0.02*peri,True)
-            x,y,w,h=cv2.boundingRect(approx)
-    return x+w//2,y+h//2
 
-def drawOnCanvas(imgres,mypts,myCval):
-    for pts in mypts:
-        cv2.circle(imgres, (pts[0], pts[1]), 7, myCval[pts[2]], cv2.FILLED)
+        if area < 3000 or area > 12000:
+            continue
+
+        if area > max_area:
+            max_area = area
+            x, y, w, h = cv2.boundingRect(cnt)
+            cx = x + w // 2
+            cy = y + h // 2
+
+    return cx, cy
+    
 
 
 def generate_frame():
-   global mypts
-   while True:
-    #read the camera frame
-    success,frame=camera.read()
-    img=cv2.flip(frame,1)
-    imgres=img.copy()
-    newpts=findColor(img,myColors,myCval,imgres)
-    if len(newpts) > 0:
-        for newpt in newpts:
-            mypts.append(newpt)
+    global mypts,active_color_id
 
-    if len(mypts) > 0:
-        drawOnCanvas(imgres,mypts,myCval)
-    
-    if not success:
-       break
-    else:
-       ret,buffer=cv2.imencode('.jpg',imgres)
-       frame=buffer.tobytes()
-      
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
 
-    yield(b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
+        img = cv2.flip(frame, 1)
+        imgres = img.copy()
 
+        if active_color_id is not None:
+           color=myColors[active_color_id]
+           result=findColor(img,color,myCval[active_color_id],imgres)
+           if result:
+              x,y=result;
+              mypts.append([x,y,active_color_id])
+        for pt in mypts:
+            cv2.circle(imgres, (pt[0], pt[1]), 7, myCval[pt[2]], cv2.FILLED)
+
+        ret, buffer = cv2.imencode('.jpg', imgres)
+        frame = buffer.tobytes()
+
+        yield (
+            b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
+        )
 
 @app.route('/home')
 def index():
@@ -90,6 +105,19 @@ def clear():
 def video():
     return Response(generate_frame(),mimetype='multipart/x-mixed-replace; boundary=frame')
     
+@app.route('/set-color/<int:cid>',methods=['POST'])
+def set_color(cid):
+    global active_color_id
+    if 0<=cid<len(myColors):
+       active_color_id=cid
+    return '',204
+
+@app.route('/set-none',methods=['POST'])
+def set_none():
+    global active_color_id
+    active_color_id=None
+    return '',204
+
 
 if __name__ == "__main__":
    app.run(debug=True)
