@@ -1,0 +1,66 @@
+body{ text-align: center;
+background: #151e3d;
+color: #00ffef;
+}
+h1{
+margin-right: 150px;
+font-family: 'Permanent Marker';
+text-shadow: 0 0 15px rgba(41,121,255,0.5);
+}
+#im{
+display: inline-block;
+border-radius:40px;
+box-shadow: 0 0 100px #00b4db;
+}
+img{border-radius:40px;
+width: 420px;
+}
+button{
+font-family: Montserrat;
+font-size:14px;
+border-radius:30px;
+padding: 10px 20px;
+background: transparent;
+color: #00ffef;
+border: 2px solid #00ffef;
+box-shadow: 0 0 10px rgba(0,255,239,0.4);
+}
+.btn{
+display: flex;
+justify-content: space-between;
+width: 420px;
+margin-top: 30px;
+margin-right: 150px;
+}
+.paint-wrap{
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+.bt1{
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+.paint{
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 50px; 
+}
+#res:hover{
+animation: resb 1s ease-in-out infinite;
+}
+@keyframes resb{
+0% { box-shadow: 0 0 0px red;}
+50%{box-shadow: 0 0 50px red;}
+100% { box-shadow: 0 0 0px red;}
+}
+.color-btn.active{
+background: rgba(0,255,239,0.15);
+box-shadow: 0 0 10px rgba(0,255,239,0.8),0 0 25px rgba(0,255,239,0.8);
+transform: scale(1.08);
+}
+#hm:hover{
+box-shadow: 0 0 25px rgba(0,255,239,0.7);
+}
