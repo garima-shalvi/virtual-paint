@@ -9,6 +9,7 @@ background: #151e3d;
 color: #00ffef;
 }
 h1{
+margin-right: 150px;
 font-family: 'Permanent Marker';
 text-shadow: 0 0 15px rgba(41,121,255,0.5);
 }
@@ -31,10 +32,16 @@ border: 2px solid #00ffef;
 box-shadow: 0 0 10px rgba(0,255,239,0.4);
 }
 .btn{
-margin-top: 30px;
 display: flex;
-justify-content: center;
-gap: 150px;
+justify-content: space-between;
+width: 420px;
+margin-top: 30px;
+margin-right: 150px;
+}
+.paint-wrap{
+display: flex;
+flex-direction: column;
+align-items: center;
 }
 .bt1{
 display: flex;
@@ -45,7 +52,7 @@ gap: 15px;
 display: flex;
 align-items: center;
 justify-content: center;
-gap: 40px; 
+gap: 50px; 
 }
 #res:hover{
 animation: resb 1s ease-in-out infinite;
@@ -67,7 +74,7 @@ box-shadow: 0 0 25px rgba(0,255,239,0.7);
 </head>
 <body>
 <h1 >Paint here</h1>
-<div>
+<div class="paint-wrap">
 <div class="paint">
 <div id="im">
 <img src="{{ url_for('video') }}" />
@@ -85,8 +92,8 @@ box-shadow: 0 0 25px rgba(0,255,239,0.7);
 <a href="/home">
 <button id="hm">Back Home</button>
 </a> 
-
-<button id="res" onclick="fetch('/clear')">Reset</button></div>
+<button id="res" onclick="fetch('/clear')">Reset</button>
+</div>
 </div>
 
 <script>
