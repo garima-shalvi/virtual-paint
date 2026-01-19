@@ -41,6 +41,10 @@ Built with **OpenCV** for vision processing and **Flask** for streaming the vide
 ![Drawing Example (Orange)](static/assets/screenshots/drawing-orange.png)
 ![Drawing Example (Light Pink)](static/assets/screenshots/drawing-pink.png)
 
+### Reset and Back Home buttons
+![Reset](static/assets/screenshots/reset.png)
+![Back Home](static/assets/screenshots/back-home.png)
+
 ---
 
 ## 🎥 Demo Video
